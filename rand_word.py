@@ -54,13 +54,15 @@ class EnglishKoreanDict:
       if group == 0 or words[ww][1].get(group):
         yield ww
 
-  def word_game(self, words, group, word):
+  def word_game(self, words, group, word, extra_wait):
     print(word)
     sys.stdin.readline()
     print(words[word][0])
+    if (extra_wait):
+      sys.stdin.readline()
     print()
 
-  def words_game(self, words, count, group, word_callback):
+  def words_game(self, words, count, group, word_callback, extra_wait):
     x=0
     for w in word_callback(words, group):
       x+=1
@@ -68,11 +70,11 @@ class EnglishKoreanDict:
         return
       print("%d)" % x)
       print()
-      self.word_game(words, group, w)
+      self.word_game(words, group, w, extra_wait)
 
   def run(self, argv):
     try:
-      opts, args = getopt.getopt(argv, "en:g:o")
+      opts, args = getopt.getopt(argv, "en:g:ow")
     except getopt.GetoptError:
       print("Args: -n [number]")
       return 2
@@ -80,24 +82,24 @@ class EnglishKoreanDict:
     group = 0
     n = 10
     ordered = False
+    extra_wait = False
+    word_dict = self.k_to_e
     for opt, arg in opts:
       if opt == "-n":
         count = int(arg)
       elif opt == "-e":
-        english = True
+        word_dict = self.e_to_k
       elif opt == "-g":
         group = int(arg)
       elif opt == "-o":
         ordered = True
+      elif opt == "-w":
+        extra_wait = True
     if ordered:
       sorter = self.all_words_ordered
     else: 
       sorter = self.all_words_randomized
-    if english:
-      self.words_game(self.e_to_k, count, group, sorter);
-    else:
-      self.words_game(self.k_to_e, count, group, sorter);
-    
+    self.words_game(word_dict, count, group, sorter, extra_wait);
 
 if __name__ == "__main__":
   d = EnglishKoreanDict()
