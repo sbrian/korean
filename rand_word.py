@@ -87,7 +87,7 @@ class EnglishKoreanDict:
       return 2
     english = False
     groups = None
-    n = 10
+    count = 10
     ordered = False
     allow_repeats = False
     extra_wait = False
