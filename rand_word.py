@@ -6,6 +6,8 @@ import random
 import sys
 import getopt
 import codecs
+import hashlib
+import dongsa
 
 class AppError(Exception):
 
@@ -14,7 +16,9 @@ class AppError(Exception):
 class EnglishKoreanDict:
 
   def __init__(self):
+    self.dongsa = dongsa.Dongsa()
     f = codecs.open('dict.txt', encoding='utf-8-sig')
+    utf8_encoder = codecs.getencoder('UTF8')
     self.e_to_k = {} 
     self.k_to_e = {} 
     for line in f:
@@ -30,8 +34,12 @@ class EnglishKoreanDict:
       tag_dict = {}
       for i in range(0,len(tag_nums)):
         tag_dict[int(tag_nums[i])] = 1
-      self.e_to_k[m.group(1)] = (m.group(2), tag_dict);
-      self.k_to_e[m.group(2)] = (m.group(1), tag_dict);
+      h = hashlib.new('md5')
+      h.update(m.group(1).encode('utf-8'))
+      hh = h.digest()
+      tag_dict[200+(hh[0]%10)] = 1
+      self.e_to_k[m.group(1)] = (m.group(2), tag_dict, False);
+      self.k_to_e[m.group(2)] = (m.group(1), tag_dict, True);
 
   def all_words_randomized_repeats(self, words, groups):
     while True:
@@ -62,7 +70,12 @@ class EnglishKoreanDict:
     return False
 
   def word_game(self, words, word, extra_wait):
-    print(word)
+    # If in the Dongsa group and K to E
+    if words[word][1].get(48) and words[word][2]:
+      conj = self.dongsa.random_form(word) 
+      print(conj[0])
+    else:
+      print(word)
     sys.stdin.readline()
     print(words[word][0])
     if (extra_wait):
