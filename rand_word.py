@@ -70,10 +70,20 @@ class EnglishKoreanDict:
     return False
 
   def word_game(self, words, word, extra_wait):
-    # If in the Dongsa group and K to E
-    if words[word][1].get(48) and words[word][2]:
-      conj = self.dongsa.random_form(word) 
-      print(conj[0])
+    # If in the Dongsa group or Hada and K to E
+    m = re.match('(.*)하다', word)
+    if (m or words[word][1].get(48)) and words[word][2]:
+      if m:
+        conj = self.dongsa.random_form('하다')
+        print(m.group(1) + conj[0])
+      else:
+        m = re.match('(.+) ([^ ]+)', word)
+        if m:
+          conj = self.dongsa.random_form(m.group(2))
+          print(m.group(1) + ' ' + conj[0])
+        else:
+          conj = self.dongsa.random_form(word)
+          print(conj[0])
     else:
       print(word)
     sys.stdin.readline()
